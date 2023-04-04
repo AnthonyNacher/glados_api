@@ -48,7 +48,7 @@ class APITestCase (TestCase):
         entity.save()
         entity.created_at="2023-04-04T21:17:56"
         entity.save()
-        
+
     def test_get_entities(self):
         response = self.client.get("/entities")
         self.assertEqual(response.status_code, 200)
@@ -139,3 +139,12 @@ class APITestCase (TestCase):
                                 "created_at": "2023-04-04T21:17:56"
                             }
                         ])
+        
+    def test_get_entities_with_wrong_status_filter_(self):
+        response = self.client.get("/entities?status=thisonedoesntexist")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
+    def test_get_entities_with_wrong_type_filter_(self):
+        response = self.client.get("/entities?type=thisonedoesntexist")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
