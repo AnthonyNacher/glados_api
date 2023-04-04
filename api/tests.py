@@ -148,3 +148,7 @@ class APITestCase (TestCase):
         response = self.client.get("/entities?type=thisonedoesntexist")
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), [])
+    def test_get_entities_with_wrong_room_filter_(self):
+        response = self.client.get("/entities?room=thisonedoesntexist")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), [])
