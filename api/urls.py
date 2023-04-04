@@ -15,8 +15,9 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import ReturnAPIVersion, EntitiesAPI
+from .views import ReturnAPIVersion, EntitiesAPI, EntityAPI
 urlpatterns = [
     path('', ReturnAPIVersion.as_view(), name="get_api_version"),
     path('entities', EntitiesAPI.as_view(), name="api_entities"),
+    path('entities/<uuid:entity_uuid>', EntityAPI.as_view(), name="api_entities"),
 ]

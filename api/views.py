@@ -49,6 +49,20 @@ class EntitiesAPI(APIView):
         serialized_entity = EntitySerializer(entities, many=True)
         return Response(serialized_entity.data)
     
+@method_decorator(csrf_exempt, name='dispatch')
+class EntityAPI(APIView):
+    def delete(self, request, entity_uuid):
+        # We want to execute delete on the Entity in case we're later modifying deletion (soft delete for example)
+        try :
+            instance = Entity.objects.get(id=entity_uuid)
+        except Entity.DoesNotExist:
+            pass
+        instance.delete()
+        response = Response()
+        response.status_code = 204
+        return response
+    
+    
 def PageNotFoundView(request, exception):
         data = {"status_code" : 404, "error": "not_found", "message" : "Resource not found."}
         return JsonResponse(data)
