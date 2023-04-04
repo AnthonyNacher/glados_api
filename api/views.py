@@ -24,13 +24,21 @@ class EntitiesAPI(APIView):
 
         # Filter by type
         type_filter = self.request.GET.get('type', None)
-        if type_filter is not None and type_filter in Entity.READABLE_TYPES.keys():
-            entities = entities.filter(type=Entity.READABLE_TYPES[type_filter])
+        if type_filter is not None :
+            if  type_filter in Entity.READABLE_TYPES.keys():
+                entities = entities.filter(type=Entity.READABLE_TYPES[type_filter])
+            else :
+                entities = []
+            
         
         # Filter by status
         status_filter = self.request.GET.get('status', None)
-        if status_filter is not None and status_filter in Entity.READABLE_STATUS.keys():
-            entities = entities.filter(status=Entity.READABLE_STATUS[status_filter])
+        if status_filter is not None :
+            if  status_filter in Entity.READABLE_STATUS.keys():
+                entities = entities.filter(status=Entity.READABLE_STATUS[status_filter])
+            else :
+                entities = []
+
 
         # Filter by room
         room_filter = self.request.GET.get('room', None)
