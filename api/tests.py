@@ -83,3 +83,26 @@ class APITestCase (TestCase):
                         ]
                          
                          )
+        
+    def test_get_entities_with_status_filter(self):
+        response = self.client.get("/entities?status=on")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), 
+                                            [
+                            {
+                                "id": "00000000-0000-0000-0000-000000000002",
+                                "name": "Lamp",
+                                "type": "light",
+                                "status": "on",
+                                "value": "200",
+                                "created_at": ""
+                            },
+                            {
+                                "id": "00000000-0000-0000-0000-000000000003",
+                                "name": "Thermometer",
+                                "type": "sensor",
+                                "status": "on",
+                                "value": "28",
+                                "created_at": ""
+                            }
+                        ])
