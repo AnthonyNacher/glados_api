@@ -32,6 +32,12 @@ class EntitiesAPI(APIView):
         if status_filter is not None and status_filter in Entity.READABLE_STATUS.keys():
             entities = entities.filter(status=Entity.READABLE_STATUS[status_filter])
 
+        # Filter by room
+        room_filter = self.request.GET.get('room', None)
+        if room_filter is not None :
+            entities = entities.filter(room__name__contains=room_filter)
+
+
         serialized_entity = EntitySerializer(entities, many=True)
         return Response(serialized_entity.data)
     
