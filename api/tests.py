@@ -161,3 +161,67 @@ class APITestCase (TestCase):
         
         self.assertEqual(response.status_code, 204)
         self.assertEqual(INITIAL_ENTITY_COUNT - 1, len(Entity.objects.all()))
+
+    def test_post_entity(self):
+        INITIAL_ENTITY_COUNT = len(Entity.objects.all())
+        self.assertEqual(INITIAL_ENTITY_COUNT, 3)
+
+        response = self.client.post("/entities", {
+                    "name": "Airton Pack Mono-split R32-5270",
+                    "type": "air_conditioner",
+                    "status": "off",
+                    "value": "1189",
+        })
+        
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(INITIAL_ENTITY_COUNT + 1, len(Entity.objects.all()))
+ 
+    def test_post_entity_minimal_data(self):
+        INITIAL_ENTITY_COUNT = len(Entity.objects.all())
+        self.assertEqual(INITIAL_ENTITY_COUNT, 3)
+
+        response = self.client.post("/entities", {
+                    "name": "Airton Pack Mono-split R32-5270",
+                    "type": "air_conditioner",
+                    "status": "off"
+        })
+        
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(INITIAL_ENTITY_COUNT + 1, len(Entity.objects.all()))
+
+    def test_post_entity_missing_data_status(self):
+        INITIAL_ENTITY_COUNT = len(Entity.objects.all())
+        self.assertEqual(INITIAL_ENTITY_COUNT, 3)
+
+        response = self.client.post("/entities", {
+                    "name": "Airton Pack Mono-split R32-5270",
+                    "type": "air_conditioner",
+        })
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(INITIAL_ENTITY_COUNT, len(Entity.objects.all()))
+
+    def test_post_entity_missing_data_type(self):
+        INITIAL_ENTITY_COUNT = len(Entity.objects.all())
+        self.assertEqual(INITIAL_ENTITY_COUNT, 3)
+
+        response = self.client.post("/entities", {
+                    "name": "Airton Pack Mono-split R32-5270",
+                    "status": "on",
+        })
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(INITIAL_ENTITY_COUNT, len(Entity.objects.all()))
+
+    def test_post_entity_missing_data_name(self):
+        INITIAL_ENTITY_COUNT = len(Entity.objects.all())
+        self.assertEqual(INITIAL_ENTITY_COUNT, 3)
+
+        response = self.client.post("/entities", {
+                    "status": "on",
+                    "type": "air_conditioner",
+        })
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(INITIAL_ENTITY_COUNT, len(Entity.objects.all()))
+
