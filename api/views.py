@@ -1,3 +1,4 @@
+import json
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 from django.utils.decorators import method_decorator
@@ -72,5 +73,5 @@ class EntityAPI(APIView):
     
     
 def PageNotFoundView(request, exception):
-        data = {"status_code" : 404, "error": "not_found", "message" : "Resource not found."}
-        return JsonResponse(data)
+        data = {"error": "not_found", "message" : "Resource not found."}
+        return HttpResponseNotFound(json.dumps(data), content_type='application/json')
