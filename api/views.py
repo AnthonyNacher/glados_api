@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .serializers import EntitySerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
-
+from rest_framework import status
 
 # Create your views here.
 from .models import Entity
@@ -48,6 +48,14 @@ class EntitiesAPI(APIView):
 
         serialized_entity = EntitySerializer(entities, many=True)
         return Response(serialized_entity.data)
+    def post(self, request):
+        
+        serialized_new_entity = EntitySerializer(data=request.POST)
+        if serialized_new_entity.is_valid():
+            serialized_new_entity.save()
+            
+            return Response(serialized_new_entity.data, status=status.HTTP_201_CREATED)
+        return Response(serialized_new_entity.errors, status=status.HTTP_400_BAD_REQUEST)
     
 @method_decorator(csrf_exempt, name='dispatch')
 class EntityAPI(APIView):
