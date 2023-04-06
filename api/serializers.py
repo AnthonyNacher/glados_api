@@ -7,6 +7,9 @@ from rest_framework import serializers
 # https://stackoverflow.com/questions/28945327/django-rest-framework-with-choicefield
 
 class CustomChoiceField(serializers.ChoiceField):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.error_messages['invalid_choice'] = 'Choice is invalid.'
     def to_representation(self, obj):
         if obj == '' and self.allow_blank:
             return obj
@@ -19,7 +22,7 @@ class CustomChoiceField(serializers.ChoiceField):
         for key, val in self._choices.items() : 
             if val == data :
                 return key
-        self.fail('invalid choice', input=data)
+        self.fail('invalid_choice', input=data)
 
 class EntitySerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S", required=False, read_only=True)

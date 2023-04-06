@@ -51,7 +51,7 @@ class EntitiesAPI(APIView):
         return Response(serialized_entity.data)
     def post(self, request):
         
-        serialized_new_entity = EntitySerializer(data=request.POST)
+        serialized_new_entity = EntitySerializer(data=request.data)
         if serialized_new_entity.is_valid():
             serialized_new_entity.save()
             
