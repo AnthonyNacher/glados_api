@@ -59,7 +59,8 @@ class APITestCase (TestCase):
                     "type": "light",
                     "status": "off",
                     "value": None,
-                    "created_at": "2023-04-04T21:17:56"
+                    "created_at": "2023-04-04T21:17:56",
+                    "room" : "Kitchen"
                 },
                 {
                     "id": "00000000-0000-0000-0000-000000000002",
@@ -67,7 +68,8 @@ class APITestCase (TestCase):
                     "type": "light",
                     "status": "on",
                     "value": "200",
-                    "created_at": "2023-04-04T21:17:56"
+                    "created_at": "2023-04-04T21:17:56",
+                    "room" : "Living Room"
                 },
                 {
                     "id": "00000000-0000-0000-0000-000000000003",
@@ -75,7 +77,8 @@ class APITestCase (TestCase):
                     "type": "sensor",
                     "status": "on",
                     "value": "28",
-                    "created_at": "2023-04-04T21:17:56"
+                    "created_at": "2023-04-04T21:17:56",
+                    "room" : "Living Room"
                 }])
     def test_get_entities_with_type_filter(self):
         response = self.client.get("/entities?type=sensor")
@@ -88,7 +91,8 @@ class APITestCase (TestCase):
                                 "type": "sensor",
                                 "status": "on",
                                 "value": "28",
-                                "created_at": "2023-04-04T21:17:56"
+                                "created_at": "2023-04-04T21:17:56",
+                                "room" : "Living Room"
                             }
                         ]
                          
@@ -105,7 +109,8 @@ class APITestCase (TestCase):
                                 "type": "light",
                                 "status": "on",
                                 "value": "200",
-                                "created_at": "2023-04-04T21:17:56"
+                                "created_at": "2023-04-04T21:17:56",
+                                "room" : "Living Room"
                             },
                             {
                                 "id": "00000000-0000-0000-0000-000000000003",
@@ -113,7 +118,8 @@ class APITestCase (TestCase):
                                 "type": "sensor",
                                 "status": "on",
                                 "value": "28",
-                                "created_at": "2023-04-04T21:17:56"
+                                "created_at": "2023-04-04T21:17:56",
+                                "room" : "Living Room"
                             }
                         ])
         
@@ -128,7 +134,8 @@ class APITestCase (TestCase):
                                 "type": "light",
                                 "status": "on",
                                 "value": "200",
-                                "created_at": "2023-04-04T21:17:56"
+                                "created_at": "2023-04-04T21:17:56",
+                                "room" : "Living Room"
                             },
                             {
                                 "id": "00000000-0000-0000-0000-000000000003",
@@ -136,7 +143,8 @@ class APITestCase (TestCase):
                                 "type": "sensor",
                                 "status": "on",
                                 "value": "28",
-                                "created_at": "2023-04-04T21:17:56"
+                                "created_at": "2023-04-04T21:17:56",
+                                "room" : "Living Room"
                             }
                         ])
         
@@ -164,6 +172,7 @@ class APITestCase (TestCase):
                     "type": "air_conditioner",
                     "status": "off",
                     "value": "1189",
+                    "room" : "Living Room"
         })
         
         self.assertEqual(response.status_code, 201)
@@ -176,7 +185,8 @@ class APITestCase (TestCase):
         response = self.client.post("/entities", {
                     "name": "Airton Pack Mono-split R32-5270",
                     "type": "air_conditioner",
-                    "status": "off"
+                    "status": "off",
+                    "room" : "Living Room"
         })
         
         self.assertEqual(response.status_code, 201)
@@ -251,6 +261,7 @@ class APITestCase (TestCase):
         INITIAL_ENTITY_TYPE = tested_entity.type
         INITIAL_ENTITY_STATUS = tested_entity.status
         INITIAL_ENTITY_VALUE = tested_entity.value
+        INITIAL_ENTITY_ROOM = tested_entity.room
 
         response = self.client.put("/entities/00000000-0000-0000-0000-000000000001", {
                     "id" : "00000000-0000-0000-0000-000000000001",
@@ -258,6 +269,7 @@ class APITestCase (TestCase):
                     "type": "sensor",
                     "status": "unavailable",
                     "value": "100",
+                    "room" : "Living room"
         },
         content_type='application/json')
         tested_entity_after_put = Entity.objects.get(id="00000000-0000-0000-0000-000000000001")
@@ -269,6 +281,7 @@ class APITestCase (TestCase):
         self.assertNotEqual(INITIAL_ENTITY_TYPE, tested_entity_after_put.type)
         self.assertNotEqual(INITIAL_ENTITY_STATUS, tested_entity_after_put.status)
         self.assertNotEqual(INITIAL_ENTITY_VALUE, tested_entity_after_put.value)
+        self.assertNotEqual(INITIAL_ENTITY_ROOM, tested_entity_after_put.room)
 
     def test_put_on_nonexistant_entity (self):
 
@@ -295,7 +308,8 @@ class APITestCase (TestCase):
                     "type": "light",
                     "status": "off",
                     "value": None,
-                    "created_at": "2023-04-04T21:17:56"
+                    "created_at": "2023-04-04T21:17:56",
+                    "room" : "Kitchen"
                 })
     def test_get_nonexistant_entity(self):
         response = self.client.get("/entities/00000000-0000-0000-0000-000000000004")
