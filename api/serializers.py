@@ -28,6 +28,7 @@ class EntitySerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S", required=False, read_only=True)
     type = CustomChoiceField(choices=Entity.TYPES)
     status = CustomChoiceField(choices=Entity.STATUS)
+    value = serializers.CharField(allow_blank=True, required=False)
     id = serializers.UUIDField(format="hex_verbose", read_only=True)
     class Meta : 
         model = Entity
