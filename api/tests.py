@@ -262,19 +262,20 @@ class APITestCase (TestCase):
         response = self.client.put("/entities", {
                     "id" : "00000000-0000-0000-0000-000000000001",
                     "name": "New Name",
-                    "type": "light",
+                    "type": "sensor",
                     "status": "unavailable",
                     "value": "100",
-        })
+        },
+        content_type='application/json')
         tested_entity_after_put = Entity.objects.get(id="00000000-0000-0000-0000-000000000001")
 
         # When the PUT is successful on an existing resource, it should return 200
         self.assertEqual(response.status_code, 200) 
         self.assertEqual(INITIAL_ENTITY_ID, tested_entity_after_put.id)
-        self.assertEqual(INITIAL_ENTITY_NAME, tested_entity_after_put.name)
-        self.assertEqual(INITIAL_ENTITY_TYPE, tested_entity_after_put.type)
-        self.assertEqual(INITIAL_ENTITY_STATUS, tested_entity_after_put.status)
-        self.assertEqual(INITIAL_ENTITY_VALUE, tested_entity_after_put.value)
+        self.assertNotEqual(INITIAL_ENTITY_NAME, tested_entity_after_put.name)
+        self.assertNotEqual(INITIAL_ENTITY_TYPE, tested_entity_after_put.type)
+        self.assertNotEqual(INITIAL_ENTITY_STATUS, tested_entity_after_put.status)
+        self.assertNotEqual(INITIAL_ENTITY_VALUE, tested_entity_after_put.value)
 
     def test_put_on_nonexistant_entity (self):
 
@@ -285,11 +286,8 @@ class APITestCase (TestCase):
                     "type": "light",
                     "status": "unavailable",
                     "value": "100",
-        })
-
+        },
+        content_type='application/json')
         # When the PUT is successful on a new resource, it should return 201
         self.assertEqual(response.status_code, 201) 
         self.assertEqual(INITIAL_ENTITY_COUNT + 1, len(Entity.objects.all()))
-
-
-        

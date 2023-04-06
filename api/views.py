@@ -58,6 +58,24 @@ class EntitiesAPI(APIView):
             return Response(serialized_new_entity.data, status=status.HTTP_201_CREATED)
         return Response(serialized_new_entity.errors, status=status.HTTP_400_BAD_REQUEST)
     
+    def put(self, request):
+        entity_id = request.data.get('id', None)
+        try:
+            entity = Entity.objects.get(id=entity_id)
+            serializer = EntitySerializer(entity, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=200)
+            else:
+                return Response(serializer.errors, status=400)
+        except Entity.DoesNotExist:
+            serializer = EntitySerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=201)
+            else:
+                return Response(serializer.errors, status=400)
+            
 @method_decorator(csrf_exempt, name='dispatch')
 class EntityAPI(APIView):
     def delete(self, request, entity_uuid):
