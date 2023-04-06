@@ -73,12 +73,13 @@ class EntityAPI(APIView):
         # We want to execute delete on the Entity in case we're later modifying deletion (soft delete for example)
         try :
             instance = Entity.objects.get(id=entity_uuid)
+            instance.delete()
         except Entity.DoesNotExist:
             pass
-        instance.delete()
         response = Response()
         response.status_code = 204
         return response
+    
     def put(self, request, entity_uuid):
         try:
             entity = Entity.objects.get(id=entity_uuid)
