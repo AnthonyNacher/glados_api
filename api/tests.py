@@ -297,6 +297,9 @@ class APITestCase (TestCase):
                     "value": None,
                     "created_at": "2023-04-04T21:17:56"
                 })
+    def test_get_nonexistant_entity(self):
+        response = self.client.get("/entities/00000000-0000-0000-0000-000000000004")
+        self.assertEqual(response.status_code, 404)
 
     def test_delete_entity(self):
         INITIAL_ENTITY_COUNT = len(Entity.objects.all())
