@@ -225,3 +225,29 @@ class APITestCase (TestCase):
         self.assertEqual(response.status_code, 400)
         self.assertEqual(INITIAL_ENTITY_COUNT, len(Entity.objects.all()))
 
+    def test_post_entity_minimal_data_but_wrong_status(self):
+        INITIAL_ENTITY_COUNT = len(Entity.objects.all())
+        self.assertEqual(INITIAL_ENTITY_COUNT, 3)
+
+        response = self.client.post("/entities", {
+                    "name": "Airton Pack Mono-split R32-5270",
+                    "type": "air_conditioner",
+                    "status": "thisisdefinitlynotanexistingstatus"
+        })
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(INITIAL_ENTITY_COUNT, len(Entity.objects.all()))
+        
+    def test_post_entity_minimal_data_but_wrong_type(self):
+        INITIAL_ENTITY_COUNT = len(Entity.objects.all())
+        self.assertEqual(INITIAL_ENTITY_COUNT, 3)
+
+        response = self.client.post("/entities", {
+                    "name": "Airton Pack Mono-split R32-5270",
+                    "type": "ahousetypeofdevicewouldntbepossibleright",
+                    "status": "off"
+        })
+        
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(INITIAL_ENTITY_COUNT, len(Entity.objects.all()))
+        
