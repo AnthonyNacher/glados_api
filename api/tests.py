@@ -153,14 +153,7 @@ class APITestCase (TestCase):
         self.assertEqual(response.status_code, 200)
         self.assertEqual(response.json(), [])
     
-    def test_delete_entity(self):
-        INITIAL_ENTITY_COUNT = len(Entity.objects.all())
-        self.assertEqual(INITIAL_ENTITY_COUNT, 3)
-
-        response = self.client.delete("/entities/00000000-0000-0000-0000-000000000001")
-        
-        self.assertEqual(response.status_code, 204)
-        self.assertEqual(INITIAL_ENTITY_COUNT - 1, len(Entity.objects.all()))
+    
 
     def test_post_entity(self):
         INITIAL_ENTITY_COUNT = len(Entity.objects.all())
@@ -291,3 +284,25 @@ class APITestCase (TestCase):
         # When the PUT is successful on a new resource, it should return 201
         self.assertEqual(response.status_code, 201) 
         self.assertEqual(INITIAL_ENTITY_COUNT + 1, len(Entity.objects.all()))
+    
+    def test_get_entity(self):
+        response = self.client.get("/entities/00000000-0000-0000-0000-000000000001")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), 
+                                {
+                    "id": "00000000-0000-0000-0000-000000000001",
+                    "name": "Ceiling Light",
+                    "type": "light",
+                    "status": "off",
+                    "value": None,
+                    "created_at": "2023-04-04T21:17:56"
+                })
+
+    def test_delete_entity(self):
+        INITIAL_ENTITY_COUNT = len(Entity.objects.all())
+        self.assertEqual(INITIAL_ENTITY_COUNT, 3)
+
+        response = self.client.delete("/entities/00000000-0000-0000-0000-000000000001")
+        
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(INITIAL_ENTITY_COUNT - 1, len(Entity.objects.all()))
