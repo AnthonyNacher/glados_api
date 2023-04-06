@@ -250,4 +250,46 @@ class APITestCase (TestCase):
         
         self.assertEqual(response.status_code, 400)
         self.assertEqual(INITIAL_ENTITY_COUNT, len(Entity.objects.all()))
+    
+    def test_put_on_existing_entity (self):
+        tested_entity = Entity.objects.get(id="00000000-0000-0000-0000-000000000001")
+        INITIAL_ENTITY_ID = tested_entity.id
+        INITIAL_ENTITY_NAME = tested_entity.name
+        INITIAL_ENTITY_TYPE = tested_entity.type
+        INITIAL_ENTITY_STATUS = tested_entity.status
+        INITIAL_ENTITY_VALUE = tested_entity.value
+
+        response = self.client.put("/entities", {
+                    "id" : "00000000-0000-0000-0000-000000000001",
+                    "name": "New Name",
+                    "type": "light",
+                    "status": "unavailable",
+                    "value": "100",
+        })
+        tested_entity_after_put = Entity.objects.get(id="00000000-0000-0000-0000-000000000001")
+
+        # When the PUT is successful on an existing resource, it should return 200
+        self.assertEqual(response.status_code, 200) 
+        self.assertEqual(INITIAL_ENTITY_ID, tested_entity_after_put.id)
+        self.assertEqual(INITIAL_ENTITY_NAME, tested_entity_after_put.name)
+        self.assertEqual(INITIAL_ENTITY_TYPE, tested_entity_after_put.type)
+        self.assertEqual(INITIAL_ENTITY_STATUS, tested_entity_after_put.status)
+        self.assertEqual(INITIAL_ENTITY_VALUE, tested_entity_after_put.value)
+
+    def test_put_on_nonexistant_entity (self):
+
+        INITIAL_ENTITY_COUNT = len(Entity.objects.all())
+        response = self.client.put("/entities", {
+                    "id" : "00000000-0000-0000-0000-000000000004",
+                    "name": "New Entity",
+                    "type": "light",
+                    "status": "unavailable",
+                    "value": "100",
+        })
+
+        # When the PUT is successful on a new resource, it should return 201
+        self.assertEqual(response.status_code, 201) 
+        self.assertEqual(INITIAL_ENTITY_COUNT + 1, len(Entity.objects.all()))
+
+
         
