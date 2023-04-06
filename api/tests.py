@@ -252,7 +252,7 @@ class APITestCase (TestCase):
         INITIAL_ENTITY_STATUS = tested_entity.status
         INITIAL_ENTITY_VALUE = tested_entity.value
 
-        response = self.client.put("/entities", {
+        response = self.client.put("/entities/00000000-0000-0000-0000-000000000001", {
                     "id" : "00000000-0000-0000-0000-000000000001",
                     "name": "New Name",
                     "type": "sensor",
@@ -273,7 +273,7 @@ class APITestCase (TestCase):
     def test_put_on_nonexistant_entity (self):
 
         INITIAL_ENTITY_COUNT = len(Entity.objects.all())
-        response = self.client.put("/entities", {
+        response = self.client.put("/entities/00000000-0000-0000-0000-000000000004", {
                     "id" : "00000000-0000-0000-0000-000000000004",
                     "name": "New Entity",
                     "type": "light",

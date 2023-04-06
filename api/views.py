@@ -58,10 +58,30 @@ class EntitiesAPI(APIView):
             return Response(serialized_new_entity.data, status=status.HTTP_201_CREATED)
         return Response(serialized_new_entity.errors, status=status.HTTP_400_BAD_REQUEST)
     
-    def put(self, request):
-        entity_id = request.data.get('id', None)
+    
+            
+@method_decorator(csrf_exempt, name='dispatch')
+class EntityAPI(APIView):
+    def get(self,request, entity_uuid):
+        try :
+            instance = Entity.objects.get(id=entity_uuid)
+            serializer = EntitySerializer(instance)
+            return Response(serializer.data, status=200)
+        except Entity.DoesNotExist:
+            return PageNotFoundView(request, Entity.DoesNotExist)
+    def delete(self, request, entity_uuid):
+        # We want to execute delete on the Entity in case we're later modifying deletion (soft delete for example)
+        try :
+            instance = Entity.objects.get(id=entity_uuid)
+        except Entity.DoesNotExist:
+            pass
+        instance.delete()
+        response = Response()
+        response.status_code = 204
+        return response
+    def put(self, request, entity_uuid):
         try:
-            entity = Entity.objects.get(id=entity_id)
+            entity = Entity.objects.get(id=entity_uuid)
             serializer = EntitySerializer(entity, data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -75,20 +95,6 @@ class EntitiesAPI(APIView):
                 return Response(serializer.data, status=201)
             else:
                 return Response(serializer.errors, status=400)
-            
-@method_decorator(csrf_exempt, name='dispatch')
-class EntityAPI(APIView):
-    def delete(self, request, entity_uuid):
-        # We want to execute delete on the Entity in case we're later modifying deletion (soft delete for example)
-        try :
-            instance = Entity.objects.get(id=entity_uuid)
-        except Entity.DoesNotExist:
-            pass
-        instance.delete()
-        response = Response()
-        response.status_code = 204
-        return response
-    
     
 def PageNotFoundView(request, exception):
         data = {"error": "not_found", "message" : "Resource not found."}
