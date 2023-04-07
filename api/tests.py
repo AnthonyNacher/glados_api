@@ -360,7 +360,7 @@ class APITestCase (TestCase):
         self.assertEqual(response.status_code, 201)
         self.assertEqual(INITIAL_ROOM_COUNT + 1, len(Room.objects.all()))
     def test_post_rooms_with_invalid_name(self):
-        INITIAL_ROOM_COUNT = len(Entity.objects.all())
+        INITIAL_ROOM_COUNT = len(Room.objects.all())
         # theres a default room so 2 initialized + 1 default
         self.assertEqual(INITIAL_ROOM_COUNT, 3)
 
@@ -397,4 +397,44 @@ class APITestCase (TestCase):
         response = self.client.get("/rooms/" + str(Room.get_not_assigned_room_id()))
         
         self.assertEqual(response.status_code, 403)
-        self.assertEqual(INITIAL_ROOM_COUNT, len(Entity.objects.all()))
+        self.assertEqual(INITIAL_ROOM_COUNT, len(Room.objects.all()))
+
+
+    def test_put_on_existing_room (self):
+        tested_room = Room.objects.get(id="11111111-1111-1111-1111-111111111101")
+        INITIAL_ROOM_NAME = tested_room.name
+
+        response = self.client.put("/rooms/11111111-1111-1111-1111-111111111101", {
+                    "name": "New Name",
+        },
+        content_type='application/json')
+        tested_room_after_put = Room.objects.get(id="11111111-1111-1111-1111-111111111101")
+
+        # When the PUT is successful on an existing resource, it should return 200
+        self.assertEqual(response.status_code, 200) 
+        self.assertNotEqual(INITIAL_ROOM_NAME, tested_room_after_put.name)
+    
+    def test_put_on_default_room (self):
+        tested_room = Room.objects.get(id=Room.get_not_assigned_room_id())
+        INITIAL_ROOM_NAME = tested_room.name
+
+        response = self.client.put("/rooms/" + str(Room.get_not_assigned_room_id()),{
+                    "name": "New Name",
+        },
+        content_type='application/json')
+        tested_room_after_put = Room.objects.get(id=Room.get_not_assigned_room_id())
+
+        # When the PUT is successful on an existing resource, it should return 200
+        self.assertEqual(response.status_code, 403) 
+        self.assertEqual(INITIAL_ROOM_NAME, tested_room_after_put.name)
+
+    def test_put_on_nonexistant_room (self):
+
+        INITIAL_ROOM_COUNT = len(Room.objects.all())
+        response = self.client.put("/rooms/11111111-1111-1111-1111-111111001114", {
+                    "name": "This is a new room",
+        },
+        content_type='application/json')
+        # When the PUT is successful on a new resource, it should return 201
+        self.assertEqual(response.status_code, 201) 
+        self.assertEqual(INITIAL_ROOM_COUNT + 1, len(Room.objects.all()))
