@@ -333,3 +333,18 @@ class APITestCase (TestCase):
         
         self.assertEqual(response.status_code, 204)
         self.assertEqual(INITIAL_ENTITY_COUNT - 1, len(Entity.objects.all()))
+
+    def test_get_rooms(self):
+
+        response = self.client.get("/rooms")
+        self.assertEqual(response.status_code, 200)
+        self.assertEqual(response.json(), 
+                                [{
+                    "id": "11111111-1111-1111-1111-111111111110",
+                    "name": "Kitchen",
+                },
+                {
+                    "id": "11111111-1111-1111-1111-111111111101",
+                    "name": "Living Room",
+                }
+                ])
