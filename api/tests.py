@@ -2,15 +2,14 @@ from django.test import TestCase
 
 # Create your tests here.
 from api.models import Entity, Room
-from api.models import get_uuid_as_hex
 from rest_framework.test import APIClient
 
 class APITestCase (TestCase):
     def setUp(self):
-        kitchen = Room(id=get_uuid_as_hex(), name="Kitchen")
+        kitchen = Room(id="11111111-1111-1111-1111-111111111110", name="Kitchen")
         kitchen.save()
 
-        living_room = Room(id=get_uuid_as_hex(), name="Living Room")
+        living_room = Room(id="11111111-1111-1111-1111-111111111101", name="Living Room")
         living_room.save()
 
         entity = Entity(
@@ -60,7 +59,7 @@ class APITestCase (TestCase):
                     "status": "off",
                     "value": None,
                     "created_at": "2023-04-04T21:17:56",
-                    "room" : "Kitchen"
+                    "room" : "11111111-1111-1111-1111-111111111110"
                 },
                 {
                     "id": "00000000-0000-0000-0000-000000000002",
@@ -69,7 +68,7 @@ class APITestCase (TestCase):
                     "status": "on",
                     "value": "200",
                     "created_at": "2023-04-04T21:17:56",
-                    "room" : "Living Room"
+                    "room" : "11111111-1111-1111-1111-111111111101"
                 },
                 {
                     "id": "00000000-0000-0000-0000-000000000003",
@@ -78,7 +77,7 @@ class APITestCase (TestCase):
                     "status": "on",
                     "value": "28",
                     "created_at": "2023-04-04T21:17:56",
-                    "room" : "Living Room"
+                    "room" : "11111111-1111-1111-1111-111111111101"
                 }])
     def test_get_entities_with_type_filter(self):
         response = self.client.get("/entities?type=sensor")
@@ -92,11 +91,9 @@ class APITestCase (TestCase):
                                 "status": "on",
                                 "value": "28",
                                 "created_at": "2023-04-04T21:17:56",
-                                "room" : "Living Room"
+                                "room" : "11111111-1111-1111-1111-111111111101"
                             }
-                        ]
-                         
-                         )
+                        ])
         
     def test_get_entities_with_status_filter(self):
         response = self.client.get("/entities?status=on")
@@ -110,7 +107,7 @@ class APITestCase (TestCase):
                                 "status": "on",
                                 "value": "200",
                                 "created_at": "2023-04-04T21:17:56",
-                                "room" : "Living Room"
+                                "room" : "11111111-1111-1111-1111-111111111101"
                             },
                             {
                                 "id": "00000000-0000-0000-0000-000000000003",
@@ -119,7 +116,7 @@ class APITestCase (TestCase):
                                 "status": "on",
                                 "value": "28",
                                 "created_at": "2023-04-04T21:17:56",
-                                "room" : "Living Room"
+                                "room" : "11111111-1111-1111-1111-111111111101"
                             }
                         ])
         
@@ -135,7 +132,7 @@ class APITestCase (TestCase):
                                 "status": "on",
                                 "value": "200",
                                 "created_at": "2023-04-04T21:17:56",
-                                "room" : "Living Room"
+                                "room" : "11111111-1111-1111-1111-111111111101"
                             },
                             {
                                 "id": "00000000-0000-0000-0000-000000000003",
@@ -144,7 +141,7 @@ class APITestCase (TestCase):
                                 "status": "on",
                                 "value": "28",
                                 "created_at": "2023-04-04T21:17:56",
-                                "room" : "Living Room"
+                                "room" : "11111111-1111-1111-1111-111111111101"
                             }
                         ])
         
@@ -172,11 +169,23 @@ class APITestCase (TestCase):
                     "type": "air_conditioner",
                     "status": "off",
                     "value": "1189",
-                    "room" : "Living Room"
+                    "room" : "11111111-1111-1111-1111-111111111101"
         })
-        
         self.assertEqual(response.status_code, 201)
         self.assertEqual(INITIAL_ENTITY_COUNT + 1, len(Entity.objects.all()))
+    def test_post_entity_with_new_room(self):
+        INITIAL_ENTITY_COUNT = len(Entity.objects.all())
+        self.assertEqual(INITIAL_ENTITY_COUNT, 3)
+
+        response = self.client.post("/entities", {
+                    "name": "Airton Pack Mono-split R32-5270",
+                    "type": "air_conditioner",
+                    "status": "off",
+                    "value": "1189",
+                    "room" : "11111111-1111-1111-1111-111111111001"
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(INITIAL_ENTITY_COUNT, len(Entity.objects.all()))
  
     def test_post_entity_minimal_data(self):
         INITIAL_ENTITY_COUNT = len(Entity.objects.all())
@@ -186,7 +195,7 @@ class APITestCase (TestCase):
                     "name": "Airton Pack Mono-split R32-5270",
                     "type": "air_conditioner",
                     "status": "off",
-                    "room" : "Living Room"
+                    "room" : "11111111-1111-1111-1111-111111111101"
         })
         
         self.assertEqual(response.status_code, 201)
@@ -269,7 +278,7 @@ class APITestCase (TestCase):
                     "type": "sensor",
                     "status": "unavailable",
                     "value": "100",
-                    "room" : "Living room"
+                    "room" : "11111111-1111-1111-1111-111111111101"
         },
         content_type='application/json')
         tested_entity_after_put = Entity.objects.get(id="00000000-0000-0000-0000-000000000001")
@@ -292,6 +301,7 @@ class APITestCase (TestCase):
                     "type": "light",
                     "status": "unavailable",
                     "value": "100",
+                    "room" : "11111111-1111-1111-1111-111111111110"
         },
         content_type='application/json')
         # When the PUT is successful on a new resource, it should return 201
@@ -309,8 +319,8 @@ class APITestCase (TestCase):
                     "status": "off",
                     "value": None,
                     "created_at": "2023-04-04T21:17:56",
-                    "room" : "Kitchen"
-                })
+                    "room" : "11111111-1111-1111-1111-111111111110"
+                                })
     def test_get_nonexistant_entity(self):
         response = self.client.get("/entities/00000000-0000-0000-0000-000000000004")
         self.assertEqual(response.status_code, 404)

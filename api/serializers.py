@@ -1,4 +1,4 @@
-from api.models import Entity
+from api.models import Entity, Room, get_not_assigned_room_id
 from rest_framework import serializers
 
 # from https://www.django-rest-framework.org/api-guide/serializers/ 
@@ -24,12 +24,18 @@ class CustomChoiceField(serializers.ChoiceField):
                 return key
         self.fail('invalid_choice', input=data)
 
+class RoomSerializer(serializers.ModelSerializer):
+    class Meta : 
+        model = Room
+        fields = ["id"]
+    
 class EntitySerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S", required=False, read_only=True)
     type = CustomChoiceField(choices=Entity.TYPES)
     status = CustomChoiceField(choices=Entity.STATUS)
     value = serializers.CharField(allow_blank=True, required=False)
     id = serializers.UUIDField(format="hex_verbose", read_only=True)
+    room = serializers.PrimaryKeyRelatedField(queryset=Room.objects.all())
     class Meta : 
         model = Entity
-        fields = ['id', 'name', 'type', 'status', 'value', 'created_at']
+        fields = ['id', 'name', 'type', 'status', 'value', 'created_at', 'room']

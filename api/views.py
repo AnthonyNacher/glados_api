@@ -9,7 +9,7 @@ from rest_framework.views import APIView
 from rest_framework import status
 
 # Create your views here.
-from .models import Entity
+from .models import Entity, Room
 from django.views.generic import View
 
 @method_decorator(csrf_exempt, name='dispatch')
@@ -50,7 +50,6 @@ class EntitiesAPI(APIView):
         serialized_entity = EntitySerializer(entities, many=True)
         return Response(serialized_entity.data)
     def post(self, request):
-        
         serialized_new_entity = EntitySerializer(data=request.data)
         if serialized_new_entity.is_valid():
             serialized_new_entity.save()
@@ -83,9 +82,17 @@ class EntityAPI(APIView):
     def put(self, request, entity_uuid):
         try:
             entity = Entity.objects.get(id=entity_uuid)
+
             serializer = EntitySerializer(entity, data=request.data)
             if serializer.is_valid():
                 serializer.save()
+                updated_entity = Entity.objects.get(id=entity_uuid)
+                request_room = Room.objects.get(id=request.data.get("room"))
+
+                if updated_entity.room != request_room:
+                    updated_entity.room = request_room
+                    updated_entity.save()
+                    serializer = EntitySerializer(updated_entity)
                 return Response(serializer.data, status=200)
             else:
                 return Response(serializer.errors, status=400)
