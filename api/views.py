@@ -119,7 +119,6 @@ class RoomsAPI(APIView):
         serialized_new_room = RoomSerializer(data=request.data)
         if serialized_new_room.is_valid():
             serialized_new_room.save()
-            
             return Response(serialized_new_room.data, status=status.HTTP_201_CREATED)
         return Response(serialized_new_room.errors, status=status.HTTP_400_BAD_REQUEST)
     

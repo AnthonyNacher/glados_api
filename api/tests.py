@@ -348,3 +348,14 @@ class APITestCase (TestCase):
                     "name": "Living Room",
                 }
                 ])
+    def test_post_rooms(self):
+        INITIAL_ROOM_COUNT = len(Entity.objects.all())
+        # theres a default room so 2 initialized + 1 default
+        self.assertEqual(INITIAL_ROOM_COUNT, 3)
+
+        response = self.client.post("/rooms", {
+                    "name": "New room",
+        })
+        
+        self.assertEqual(response.status_code, 201)
+        self.assertEqual(INITIAL_ROOM_COUNT + 1, len(Room.objects.all()))
