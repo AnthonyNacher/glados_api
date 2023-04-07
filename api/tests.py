@@ -359,3 +359,13 @@ class APITestCase (TestCase):
         
         self.assertEqual(response.status_code, 201)
         self.assertEqual(INITIAL_ROOM_COUNT + 1, len(Room.objects.all()))
+    def test_post_rooms_with_invalid_name(self):
+        INITIAL_ROOM_COUNT = len(Entity.objects.all())
+        # theres a default room so 2 initialized + 1 default
+        self.assertEqual(INITIAL_ROOM_COUNT, 3)
+
+        response = self.client.post("/rooms", {
+                    "name": "",
+        })
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(INITIAL_ROOM_COUNT, len(Room.objects.all()))
