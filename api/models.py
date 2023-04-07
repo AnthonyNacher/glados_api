@@ -15,6 +15,18 @@ def get_not_assigned_room_id():
         instance.save()
         return instance.id
 class Entity (models.Model):
+    TYPE_TRANSLATIONS = {
+        "sensor": "détecteur",
+        "light": "lumière",
+        "switch": "interrupteur",
+        "multimedia": "multimédia",
+        "air_conditioner": "climatiseur",
+    }
+    STATUS_TRANSLATIONS = {
+        "on": "allumé",
+        "off": "éteint",
+        "unavailable": "indisponible",
+    }
     READABLE_TYPES = {
         "sensor" : "1",
         "light" : "2",
@@ -50,14 +62,17 @@ class Entity (models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     room = models.ForeignKey("Room", on_delete=models.CASCADE, null=False, default=get_not_assigned_room_id)
     def get_status(self):
-        return self.get_status_display()
+        
+        return Entity.STATUS_TRANSLATIONS[self.get_status_display()]
     def get_type(self):
-        return self.get_type_display()
+        return Entity.TYPE_TRANSLATIONS[self.get_type_display()]
     class Meta:
         verbose_name="Appareil"
         verbose_name_plural="Appareils"
     def __str__(self):
         return f"{self.id} - {self.name} - (type : {self.type} / statut : {self.status} / valeur : {self.value})"
+    def get_tts(self):
+        return f"L'appareil de type { self.get_type() } nommé { self.name } est { self.get_status() }." + (f"Il a une valeur de { self.value } euros." if self.value else "")
     
 class Room (models.Model):
     id = models.UUIDField(primary_key=True, default=get_uuid_as_hex)
@@ -70,3 +85,8 @@ class Room (models.Model):
         return f"{self.id} - {self.name}"
     def get_not_assigned_room_id():
         return get_not_assigned_room_id()
+    def get_tts(self):
+        entity_count = Entity.objects.filter(room=self).count()
+        # count cannot be negative (except if its zero)
+        room_entities_text = "aucun" if entity_count == 0 else "un" if entity_count == 1 else "plusieurs"
+        return f"La pièce {self.name}{ ' ne ' if entity_count==0 else ' '}comporte { room_entities_text } appareils{'.' if entity_count==0 else ' : '}"

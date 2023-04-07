@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from .views import ReturnAPIVersion, EntitiesAPI, EntityAPI, RoomsAPI, RoomAPI
+from .views import ReturnAPIVersion, EntitiesAPI, EntityAPI, RoomsAPI, RoomAPI, TextToSpeechResume
 urlpatterns = [
     path('', ReturnAPIVersion.as_view(), name="get_api_version"),
     path('rooms', RoomsAPI.as_view(), name="api_rooms"),
     path('rooms/<uuid:room_uuid>', RoomAPI.as_view(), name="api_room"),
     path('entities', EntitiesAPI.as_view(), name="api_entities"),
     path('entities/<uuid:entity_uuid>', EntityAPI.as_view(), name="api_entity"),
+    path('getTTS', TextToSpeechResume, name="api_tts_resume"),
 ]

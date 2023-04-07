@@ -173,3 +173,20 @@ class RoomAPI(APIView):
             else:
                 return Response(serializer.errors, status=400)
     
+def TextToSpeechResume(request):
+        tts_speech = "Voici toutes les entités présentes."
+        end_speech = ""
+        for room in Room.objects.all():
+            if room.id == Room.get_not_assigned_room_id():
+                default_room_entities_count = Entity.objects.filter(room=Room.get_not_assigned_room_id()).count()
+                if default_room_entities_count > 0:
+                    end_speech = "En revanche, certains appareils ne sont pas encore assignés à une pièce."
+                    for entity in Entity.objects.filter(room=Room.get_not_assigned_room_id()) :
+                        end_speech += entity.get_tts()
+            else : 
+                tts_speech += room.get_tts()
+                for entity in Entity.objects.filter(room=room) :
+                    tts_speech += entity.get_tts()
+        final_speech = tts_speech + end_speech
+            
+        return JsonResponse(data= {"text" : final_speech})
