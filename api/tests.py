@@ -376,8 +376,25 @@ class APITestCase (TestCase):
 
     def test_get_default_room(self):
         response = self.client.get("/rooms/" + str(Room.get_not_assigned_room_id()))
-        self.assertEqual(response.status_code, 404)
+        self.assertEqual(response.status_code, 403)
 
     def test_get_nonexistant_room(self):
         response = self.client.get("/rooms/00000000-0000-0000-0000-111111001114")
         self.assertEqual(response.status_code, 404)
+
+    def test_delete_room(self):
+        INITIAL_ROOM_COUNT = len(Room.objects.all())
+        self.assertEqual(INITIAL_ROOM_COUNT, 3)
+
+        response = self.client.delete("/rooms/11111111-1111-1111-1111-111111111101")
+        
+        self.assertEqual(response.status_code, 204)
+        self.assertEqual(INITIAL_ROOM_COUNT - 1, len(Room.objects.all()))
+    def test_delete_default_room(self):
+        INITIAL_ROOM_COUNT = len(Room.objects.all())
+        self.assertEqual(INITIAL_ROOM_COUNT, 3)
+
+        response = self.client.get("/rooms/" + str(Room.get_not_assigned_room_id()))
+        
+        self.assertEqual(response.status_code, 403)
+        self.assertEqual(INITIAL_ROOM_COUNT, len(Entity.objects.all()))
