@@ -125,3 +125,51 @@ class RoomsAPI(APIView):
 def PageNotFoundView(request, exception):
         data = {"error": "not_found", "message" : "Resource not found."}
         return HttpResponseNotFound(json.dumps(data), content_type='application/json')
+
+       
+@method_decorator(csrf_exempt, name='dispatch')
+class RoomAPI(APIView):
+    def get(self,request, room_uuid):
+        if room_uuid == Room.get_not_assigned_room_id():
+            return Response(status=403)
+        try :
+            instance = Room.objects.get(id=room_uuid)
+            serializer = RoomSerializer(instance)
+            return Response(serializer.data, status=200)
+        except Room.DoesNotExist:
+            return PageNotFoundView(request, Room.DoesNotExist)
+        
+    def delete(self, request, room_uuid):
+        if room_uuid == Room.get_not_assigned_room_id():
+            return Response(status=403)
+        
+        # .delete for softdelete later (see Entity)
+        try :
+            instance = Room.objects.get(id=room_uuid)
+            instance.delete()
+        except Room.DoesNotExist:
+            pass
+        response = Response()
+        response.status_code = 204
+        return response
+    
+    def put(self, request, room_uuid):
+        if room_uuid == Room.get_not_assigned_room_id():
+            return Response(status=403)
+        try:
+            room = Room.objects.get(id=room_uuid)
+
+            serializer = RoomSerializer(room, data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=200)
+            else:
+                return Response(serializer.errors, status=400)
+        except Room.DoesNotExist:
+            serializer = RoomSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=201)
+            else:
+                return Response(serializer.errors, status=400)
+    
