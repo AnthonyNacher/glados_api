@@ -3,7 +3,7 @@ from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse, HttpResponseNotFound
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
-from .serializers import EntitySerializer
+from .serializers import EntitySerializer, RoomSerializer
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework import status
@@ -103,6 +103,25 @@ class EntityAPI(APIView):
                 return Response(serializer.data, status=201)
             else:
                 return Response(serializer.errors, status=400)
+    
+
+
+
+
+@method_decorator(csrf_exempt, name='dispatch')
+class RoomsAPI(APIView):
+    def get(self, request):
+        rooms = Room.objects.all().exclude(id=Room.get_not_assigned_room_id())
+
+        serialized_room = RoomSerializer(rooms, many=True)
+        return Response(serialized_room.data)
+    def post(self, request):
+        serialized_new_room = RoomSerializer(data=request.data)
+        if serialized_new_room.is_valid():
+            serialized_new_room.save()
+            
+            return Response(serialized_new_room.data, status=status.HTTP_201_CREATED)
+        return Response(serialized_new_room.errors, status=status.HTTP_400_BAD_REQUEST)
     
 def PageNotFoundView(request, exception):
         data = {"error": "not_found", "message" : "Resource not found."}

@@ -27,7 +27,7 @@ class CustomChoiceField(serializers.ChoiceField):
 class RoomSerializer(serializers.ModelSerializer):
     class Meta : 
         model = Room
-        fields = ["id"]
+        fields = ["id", "name"]
     
 class EntitySerializer(serializers.ModelSerializer):
     created_at = serializers.DateTimeField(format="%Y-%m-%dT%H:%M:%S", required=False, read_only=True)

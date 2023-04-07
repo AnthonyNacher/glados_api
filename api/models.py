@@ -68,3 +68,5 @@ class Room (models.Model):
         verbose_name_plural="Pièces"    
     def __str__(self):
         return f"{self.id} - {self.name}"
+    def get_not_assigned_room_id():
+        return get_not_assigned_room_id()
